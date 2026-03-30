@@ -13,6 +13,7 @@ function isSubstackPage() {
 
 function getPageInfo() {
   const isSubstack = isSubstackPage();
+  const articlePage = isArticlePage();
   const titleEl =
     document.querySelector('h1.post-title') ||
     document.querySelector('h1[class*="post-title"]') ||
@@ -26,7 +27,7 @@ function getPageInfo() {
     document.querySelector('[class*="byline"] a');
   const author = authorEl ? authorEl.textContent.trim() : '';
 
-  return { isSubstack, title, author, url: window.location.href };
+  return { isSubstack, isArticle: articlePage, title, author, url: window.location.href };
 }
 
 // Convert relative/protocol-relative URLs in an HTML string to absolute
@@ -108,6 +109,10 @@ let settings = {
   progressBar: true,
   bionicReading: false,
   bionicIntensity: 'light',
+  fontPreset: 'classic',
+  fontSize: '18',
+  lineHeight: '1.8',
+  contentWidth: '720',
 };
 
 const INTENSITY = {
@@ -144,6 +149,63 @@ function getArticleElement() {
 // ─── Scroll ───────────────────────────────────────────────────────────────────
 
 let scrollContainer = null;
+let articleMetrics = null;
+
+const FONT_PRESETS = {
+  classic: 'Georgia, "Times New Roman", serif',
+  modern: 'Avenir Next, Avenir, "Segoe UI", sans-serif',
+  editorial: 'Iowan Old Style, Palatino, "Book Antiqua", serif',
+};
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function getArticleHeadings(article) {
+  return Array.from(article.querySelectorAll('h2, h3, h4'))
+    .map((heading) => ({
+      element: heading,
+      title: heading.textContent.trim(),
+    }))
+    .filter((heading) => heading.title);
+}
+
+function getArticleMetrics(article) {
+  const text = article.innerText || article.textContent || '';
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return {
+    totalWords: words,
+    headings: getArticleHeadings(article),
+  };
+}
+
+function formatMinutes(wordsLeft) {
+  const minutes = Math.max(1, Math.ceil(wordsLeft / 220));
+  return `${minutes} min left`;
+}
+
+function estimateWordsLeft(scrollProgress) {
+  if (!articleMetrics) return null;
+  return Math.max(0, Math.round(articleMetrics.totalWords * (1 - scrollProgress)));
+}
+
+function getCurrentHeading() {
+  if (!articleMetrics || !articleMetrics.headings.length) return '';
+
+  const viewportAnchor = window.innerHeight * 0.28;
+  let currentTitle = articleMetrics.headings[0].title;
+
+  for (const heading of articleMetrics.headings) {
+    const rect = heading.element.getBoundingClientRect();
+    if (rect.top <= viewportAnchor) {
+      currentTitle = heading.title;
+    } else {
+      break;
+    }
+  }
+
+  return currentTitle;
+}
 
 function getScrollMetrics() {
   const c = scrollContainer;
@@ -186,27 +248,98 @@ function createProgressBar() {
   label.id = 'sr-progress-label';
   label.textContent = '0%';
 
+  const context = document.createElement('div');
+  context.id = 'sr-progress-context';
+  context.innerHTML = '<span id="sr-progress-remaining">0 min left</span><span id="sr-progress-divider">•</span><span id="sr-progress-section">Start</span>';
+
   container.appendChild(bar);
   document.body.appendChild(container);
   document.body.appendChild(label);
+  document.body.appendChild(context);
 }
 
 function removeProgressBar() {
   document.getElementById('sr-progress-container')?.remove();
   document.getElementById('sr-progress-label')?.remove();
+  document.getElementById('sr-progress-context')?.remove();
 }
 
 function updateProgress() {
   const bar = document.getElementById('sr-progress-bar');
   const label = document.getElementById('sr-progress-label');
+  const remaining = document.getElementById('sr-progress-remaining');
+  const section = document.getElementById('sr-progress-section');
   if (!bar) return;
 
   const { scrollTop, scrollHeight, clientHeight } = getScrollMetrics();
   const scrollable = scrollHeight - clientHeight;
   const pct = scrollable > 0 ? Math.min(100, Math.round((scrollTop / scrollable) * 100)) : 0;
+  const progress = scrollable > 0 ? clamp(scrollTop / scrollable, 0, 1) : 0;
 
   bar.style.width = pct + '%';
   if (label) label.textContent = pct + '%';
+  if (remaining) {
+    const wordsLeft = estimateWordsLeft(progress);
+    remaining.textContent = wordsLeft == null ? '' : formatMinutes(wordsLeft);
+  }
+  if (section) {
+    section.textContent = getCurrentHeading() || 'Reading';
+  }
+}
+
+function ensureReaderStyleTag() {
+  let style = document.getElementById('sr-reader-styles');
+  if (!style) {
+    style = document.createElement('style');
+    style.id = 'sr-reader-styles';
+    document.head.appendChild(style);
+  }
+  return style;
+}
+
+function applyTypography(article) {
+  const style = ensureReaderStyleTag();
+  const fontFamily = FONT_PRESETS[settings.fontPreset] || FONT_PRESETS.classic;
+  const fontSize = clamp(Number(settings.fontSize) || 18, 15, 24);
+  const lineHeight = clamp(Number(settings.lineHeight) || 1.8, 1.4, 2.2);
+  const contentWidth = clamp(Number(settings.contentWidth) || 720, 560, 920);
+
+  article.dataset.srTypography = '1';
+  style.textContent = `
+    :root {
+      --sr-font-family: ${fontFamily};
+      --sr-font-size: ${fontSize}px;
+      --sr-line-height: ${lineHeight};
+      --sr-content-width: ${contentWidth}px;
+    }
+
+    [data-sr-typography="1"] {
+      font-family: var(--sr-font-family) !important;
+      font-size: var(--sr-font-size) !important;
+      line-height: var(--sr-line-height) !important;
+      max-width: min(calc(100vw - 32px), var(--sr-content-width)) !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      letter-spacing: 0.01em;
+    }
+
+    [data-sr-typography="1"] p,
+    [data-sr-typography="1"] li,
+    [data-sr-typography="1"] blockquote {
+      font-family: inherit !important;
+      font-size: 1em !important;
+      line-height: inherit !important;
+    }
+
+    [data-sr-typography="1"] h1,
+    [data-sr-typography="1"] h2,
+    [data-sr-typography="1"] h3,
+    [data-sr-typography="1"] h4 {
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      max-width: 28ch;
+    }
+  `;
 }
 
 // ─── Bionic reading ───────────────────────────────────────────────────────────
@@ -282,13 +415,20 @@ function removeBionicReading(container) {
 function applySettings() {
   const article = getArticleElement();
 
+  if (article) {
+    articleMetrics = getArticleMetrics(article);
+  }
+
   if (settings.progressBar) {
     createProgressBar();
+    updateProgress();
   } else {
     removeProgressBar();
   }
 
   if (article) {
+    applyTypography(article);
+
     if (settings.bionicReading) {
       applyBionicReading(article);
     } else {
@@ -299,11 +439,15 @@ function applySettings() {
 
 function loadSettings() {
   chrome.storage.sync.get(
-    ['progressBar', 'bionicReading', 'bionicIntensity'],
+    ['progressBar', 'bionicReading', 'bionicIntensity', 'fontPreset', 'fontSize', 'lineHeight', 'contentWidth'],
     (result) => {
       settings.progressBar = result.progressBar !== false;
       settings.bionicReading = result.bionicReading === true;
       settings.bionicIntensity = result.bionicIntensity || 'light';
+      settings.fontPreset = result.fontPreset || 'classic';
+      settings.fontSize = result.fontSize || '18';
+      settings.lineHeight = result.lineHeight || '1.8';
+      settings.contentWidth = result.contentWidth || '720';
       applySettings();
     }
   );

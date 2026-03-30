@@ -35,6 +35,68 @@
   z-index: 2147483647;
 }
 
+#sr-progress-context {
+  position: fixed;
+  top: 34px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: min(42ch, calc(100vw - 24px));
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 248, 242, 0.94);
+  color: #6c3c1f;
+  font-size: 11px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(73, 37, 15, 0.14);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+  z-index: 2147483647;
+}
+
+#sr-progress-divider {
+  opacity: 0.45;
+}
+
+#sr-progress-section {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ── Bionic reading ── */
 /* font-weight is set via inline style on each .sr-bold span,
    which beats any non-!important page CSS */
+
+@media (max-width: 640px) {
+  #sr-progress-label {
+    top: 10px;
+    right: 10px;
+  }
+
+  #sr-progress-context {
+    top: 34px;
+    left: 10px;
+    right: 10px;
+    justify-content: center;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  #sr-progress-container {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  #sr-progress-label {
+    background: rgba(12, 12, 13, 0.7);
+  }
+
+  #sr-progress-context {
+    background: rgba(37, 24, 16, 0.92);
+    color: #ffd8bf;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
+  }
+}

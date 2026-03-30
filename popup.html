@@ -155,6 +155,83 @@
       background: #fff5f1;
     }
 
+    .control-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .control-row {
+      display: grid;
+      gap: 5px;
+    }
+
+    .control-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .control-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #222;
+    }
+
+    .control-value {
+      font-size: 11px;
+      color: #999;
+    }
+
+    .control-select,
+    .control-range {
+      width: 100%;
+      font-family: inherit;
+    }
+
+    .control-select {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 12px;
+      background: #fff;
+      color: #1a1a1a;
+      outline: none;
+    }
+
+    .control-select:focus {
+      border-color: #ff6b35;
+    }
+
+    .control-range {
+      accent-color: #ff6b35;
+    }
+
+    .control-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 2px;
+    }
+
+    .btn-tertiary {
+      border: 1px solid #e2d7cf;
+      border-radius: 999px;
+      background: #fff;
+      color: #7a5a49;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .btn-tertiary:hover {
+      background: #fff6f1;
+      border-color: #d8b8a6;
+      color: #a1471f;
+    }
+
     /* Archive section */
     .article-info { margin-bottom: 12px; }
 
@@ -271,6 +348,92 @@
     .archive-status.success { background: #f0fdf4; color: #16a34a; }
     .archive-status.error   { background: #fef2f2; color: #dc2626; }
 
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid #ead8cf;
+      border-radius: 8px;
+      background: #fff8f4;
+      color: #8a4b2a;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .btn-secondary:hover { background: #fff1e8; border-color: #ddb4a0; }
+    .btn-secondary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .btn-secondary.active {
+      background: #ffefe5;
+      border-color: #ff6b35;
+      color: #c34e1f;
+    }
+
+    .reading-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .reading-list-empty {
+      font-size: 12px;
+      line-height: 1.5;
+      color: #999;
+    }
+
+    .reading-item {
+      padding: 10px;
+      border: 1px solid #eee2d9;
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .reading-item-title {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.4;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+
+    .reading-item-meta {
+      font-size: 11px;
+      color: #8f8f8f;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .reading-item-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .reading-item-actions button {
+      flex: 1;
+      border: 1px solid #e6e6e6;
+      border-radius: 7px;
+      background: #fafafa;
+      color: #444;
+      padding: 7px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .reading-item-actions button:hover {
+      border-color: #d2d2d2;
+      background: #f2f2f2;
+    }
+
     .not-substack {
       display: flex;
       align-items: center;
@@ -300,6 +463,11 @@
       .toggle-slider { background: #3a3a3c; }
       .segmented button { background: #2c2c2e; border-color: #3a3a3c; color: #636366; }
       .segmented button.active { border-color: #ff6b35; color: #ff6b35; background: #2c1a12; }
+      .control-label { color: #f0f0f0; }
+      .control-value { color: #8e8e93; }
+      .control-select { background: #2c2c2e; border-color: #3a3a3c; color: #f0f0f0; }
+      .btn-tertiary { background: #2c2c2e; border-color: #4c413b; color: #d7b8a7; }
+      .btn-tertiary:hover { background: #372c28; border-color: #7b5747; color: #ffbe9d; }
       .article-title { color: #f0f0f0; }
       .article-meta { color: #636366; }
       .filename-label { color: #636366; }
@@ -309,7 +477,16 @@
       .filename-ext { color: #636366; }
       .btn-archive { background: #2c2c2e; color: #f0f0f0; }
       .btn-archive:hover:not(:disabled) { background: #3a3a3c; }
+      .btn-secondary { background: #2d221c; border-color: #4d362d; color: #ffbe9d; }
+      .btn-secondary:hover { background: #3a2922; border-color: #6b4638; }
+      .btn-secondary.active { background: #45281d; border-color: #ff6b35; color: #ffb18a; }
       .btn-sub { color: #636366; }
+      .reading-list-empty { color: #8e8e93; }
+      .reading-item { background: #2c2c2e; border-color: #3a3a3c; }
+      .reading-item-title { color: #f0f0f0; }
+      .reading-item-meta { color: #8e8e93; }
+      .reading-item-actions button { background: #1c1c1e; border-color: #3a3a3c; color: #f0f0f0; }
+      .reading-item-actions button:hover { background: #2a2a2c; border-color: #555; }
       .not-substack { color: #636366; }
       .footer { color: #48484a; }
       .archive-status.info    { background: #1a2744; color: #93b4f8; }
@@ -360,9 +537,55 @@
     </div>
   </div>
 
+  <div class="section">
+    <div class="section-title">Typography</div>
+    <div class="control-grid">
+      <div class="control-row">
+        <div class="control-label-row">
+          <label class="control-label" for="fontPreset">Reading style</label>
+        </div>
+        <select id="fontPreset" class="control-select">
+          <option value="classic">Classic serif</option>
+          <option value="modern">Modern sans</option>
+          <option value="editorial">Editorial serif</option>
+        </select>
+      </div>
+      <div class="control-row">
+        <div class="control-label-row">
+          <label class="control-label" for="fontSize">Font size</label>
+          <span class="control-value" id="fontSizeValue">18 px</span>
+        </div>
+        <input id="fontSize" class="control-range" type="range" min="15" max="24" step="1" />
+      </div>
+      <div class="control-row">
+        <div class="control-label-row">
+          <label class="control-label" for="lineHeight">Line spacing</label>
+          <span class="control-value" id="lineHeightValue">1.8</span>
+        </div>
+        <input id="lineHeight" class="control-range" type="range" min="1.4" max="2.2" step="0.1" />
+      </div>
+      <div class="control-row">
+        <div class="control-label-row">
+          <label class="control-label" for="contentWidth">Content width</label>
+          <span class="control-value" id="contentWidthValue">720 px</span>
+        </div>
+        <input id="contentWidth" class="control-range" type="range" min="560" max="920" step="20" />
+      </div>
+      <div class="control-actions">
+        <button id="resetTypography" class="btn-tertiary" type="button">Reset to defaults</button>
+      </div>
+    </div>
+  </div>
+
   <div class="section" id="archive-section">
     <div class="section-title">Archive</div>
     <div id="archive-content"><!-- populated by popup.js --></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Reading List</div>
+    <button class="btn-secondary" id="saveToReadingList">Save current article</button>
+    <div class="reading-list" id="readingList"></div>
   </div>
 
   <div class="footer">SuperSubstack v2</div>
